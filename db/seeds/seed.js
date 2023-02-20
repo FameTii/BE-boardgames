@@ -125,4 +125,4 @@ const seed = ({ categoryData, commentData, reviewData, userData }) => {
     });
 };
 
-module.exports = seed;
+module.exports = {seed};
