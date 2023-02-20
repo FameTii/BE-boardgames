@@ -3,10 +3,6 @@ const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
-const { describe } = require("yargs");
-const { it } = require("node:test");
-const { expect } = require("@jest/globals");
-const { type } = require("os");
 
 beforeEach(() => seed(testData));
 
