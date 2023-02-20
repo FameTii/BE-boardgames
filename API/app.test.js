@@ -1,8 +1,9 @@
 const request = require("supertest");
-const { seed } = require("../db/seeds/seed");
+const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
+const { expect } = require("@jest/globals");
 
 beforeEach(() => seed(testData));
 
@@ -17,6 +18,7 @@ describe('GET /api/categories', () => {
             .expect(200)
             .then(({body}) => {
                 expect(typeof body).toBe('object')
+                expect(body.categories).toHaveLength(4)
                 const {categories} = body
                 expect(body.categories).toBeInstanceOf(Array);
                 categories.forEach((category) => {
