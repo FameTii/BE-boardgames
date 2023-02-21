@@ -3,10 +3,8 @@ const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
-const { url } = require("inspector");
-const { expect } = require("@jest/globals");
 const {toBeSortedBy} = require('jest-sorted');
-
+const { expect } = require("@jest/globals");
 
 beforeEach(() => seed(testData));
 
@@ -32,6 +30,14 @@ describe('GET /api/categories', () => {
                 })
             })
     })
+    it("should respond with 404 and message if route does not exist", () => {
+        return request(app)
+          .get("/api/cate")
+          .expect(404)
+          .then((body) => {
+            expect(body.text).toEqual(`route does not exist`);
+          })
+      });
 })
 
 describe('GET /api/reviews', () => {
@@ -91,8 +97,8 @@ describe('GET /api/reviews/:review_id', () => {
         return request(app)
           .get(`/api/reviews/${review_id}`)
           .expect(404)
-          .then(({ body }) => {
-            expect(body.msg).toEqual(`no review found`);
+          .then(( body) => {
+            expect(body.text).toEqual(`no review found`);
           });
       });
 

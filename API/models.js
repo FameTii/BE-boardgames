@@ -1,8 +1,15 @@
+const { readSync } = require('fs');
 const db = require('../db/connection')
 
 exports.fetchCategories = () => {
     const queryStr = `SELECT slug, description FROM categories`
     return db.query(queryStr).then((result) => {
+        if (result.rows === undefined) {
+            return Promise.reject({
+                status: 404,
+                msg: 'route does not exist'
+            })
+        }
         return result.rows;
       });
 }
