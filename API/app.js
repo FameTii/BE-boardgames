@@ -1,12 +1,17 @@
 const express = require("express");
 const app = express();
-const { getCategories } = require("./controller");
+const { getCategories, getReviews, getReviewsWithId } = require("./controller");
+const { handlesIncorrectPaths, handlesIncorrectReviewIds, PSQLhandlers, handle500statuses } = require("./errorHandlingControllers")
 
 app.get("/api/categories", getCategories);
 
-app.use((err, req, res, next) => {
-    console.log(err);
-    res.status(500).send('Server Error!');
-  });
+app.get("/api/reviews", getReviews);
+
+app.get("/api/reviews/:review_id", getReviewsWithId);
+
+app.use(handlesIncorrectPaths)
+app.use(handlesIncorrectReviewIds)
+app.use(PSQLhandlers)
+app.use(handle500statuses)
 
 module.exports = app;
