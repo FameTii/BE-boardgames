@@ -86,4 +86,14 @@ describe('GET /api/reviews/:review_id', () => {
             })
         })
     })
+    it("should response with 404 and review not found", () => {
+        const review_id = 50;
+        return request(app)
+          .get(`/api/reviews/${review_id}`)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toEqual(`no review found`);
+          });
+      });
 
+      

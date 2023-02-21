@@ -26,9 +26,16 @@ exports.fetchReviewsWithId = (review_id) => {
     LEFT JOIN comments ON reviews.review_id = comments.review_id
     WHERE reviews.review_id = ${review_id}
     GROUP BY reviews.review_id`
-
     return db.query(queryStr).then((result) => {
-        return result.rows[0]
+        const review = result.rows[0]
+        if (review === undefined) {
+            return Promise.reject({
+                status: 404,
+                msg: `no review found`
+            })
+        } else {
+            return review
+        }
     })
 }
 
