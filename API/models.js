@@ -40,7 +40,8 @@ exports.fetchReviewsWithId = (review_id) => {
                 status: 404,
                 msg: `no review found`
             })
-        } else {
+        } 
+        else {
             return review
         }
     })

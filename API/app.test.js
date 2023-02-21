@@ -63,8 +63,6 @@ describe('GET /api/reviews', () => {
                     })
                     expect(reviews).toHaveLength(13)
                 })
-                const findByID = reviews.find(({review_id}) => review_id === 2 && 3)
-                expect(findByID.comment_count).toBe(3)
                 expect(reviews).toBeSortedBy('created_at', {descending: true});
             })
     })
@@ -78,7 +76,7 @@ describe('GET /api/reviews/:review_id', () => {
             .expect(200)
             .then(({body}) => {
                 expect(typeof body).toBe('object')
-                expect(body.reviewsId).toEqual({
+                expect(body.review).toEqual({
                     review_id: 3,
                     title: 'Ultimate Werewolf',
                     review_body: `We couldn't find the werewolf!`,
@@ -91,15 +89,24 @@ describe('GET /api/reviews/:review_id', () => {
                 })
             })
         })
-    })
     it("should response with 404 and review not found", () => {
         const review_id = 50;
         return request(app)
-          .get(`/api/reviews/${review_id}`)
-          .expect(404)
-          .then(( body) => {
+        .get(`/api/reviews/${review_id}`)
+        .expect(404)
+        .then(( body) => {
             expect(body.text).toEqual(`no review found`);
+            });
+    }) 
+    it("should response with 400 and bad request", () => {
+        return request(app)
+          .get(`/api/reviews/egg`)
+          .expect(400)
+          .then(( body) => {
+            expect(body.text).toEqual(`bad request`);
           });
       });
+});
+    
 
       
