@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
 const {toBeSortedBy} = require('jest-sorted');
-const { expect } = require("@jest/globals");
 
 beforeEach(() => seed(testData));
 
@@ -89,7 +88,7 @@ describe('GET /api/reviews/:review_id', () => {
                 })
             })
         })
-    it("should response with 404 and review not found", () => {
+    it("should respond with 404 and review not found", () => {
         const review_id = 50;
         return request(app)
         .get(`/api/reviews/${review_id}`)
@@ -98,7 +97,7 @@ describe('GET /api/reviews/:review_id', () => {
             expect(body.text).toEqual(`no review found`);
             });
     }) 
-    it("should response with 400 and bad request", () => {
+    it("should respond with 400 and bad request", () => {
         return request(app)
           .get(`/api/reviews/egg`)
           .expect(400)
@@ -107,6 +106,72 @@ describe('GET /api/reviews/:review_id', () => {
           });
       });
 });
-    
 
-      
+describe('POST /api/reviews/:review_id/comments', () => {
+    it('responds with 201: request body accepts an object with username and body property, returns posted comment', () => {
+        const review_id = 1
+        const newComment = {
+            username: "dav3rid",
+            body: "hahahehe"
+        }
+        return request(app) 
+            .post(`/api/reviews/${review_id}/comments`)
+            .send(newComment)
+            .expect(201)
+            .then(({body}) => {
+                expect(body).toMatchObject({
+                    comment_id: 7,
+                    body: 'hahahehe',
+                    review_id: 1,
+                    author: "dav3rid",
+                    votes: 0, 
+                    created_at: expect.any(String)
+                })
+            })
+    })
+    it("should responsd with 404 and review not found", () => {
+        const review_id = 50;
+        const newComment = {
+            username: "dav3rid",
+            body:'hehehohoegg'
+        }
+        return request(app)
+        .post(`/api/reviews/${review_id}/comments`)
+        .send(newComment)
+        .expect(404)
+        .then(( body) => {
+            expect(body.text).toEqual(`cannot find review_id`);
+            });
+    }) 
+    it("should response with 400 and bad request", () => {
+        const review_id = 1
+        const newComment = {
+            username: "dav3rid",
+            body:'hehehohoegg'
+        }
+        return request(app)
+          .post(`/api/reviews/egg/comments`)
+          .send(newComment)
+          .expect(400)
+          .then(( body) => {
+            expect(body.text).toEqual(`bad request`);
+          });
+      });
+    it('should respond with 403 if not enough information provided', () => {
+        const review_id = 1
+        const newComment = {
+            username: "dav3rid",
+            body:''
+        }
+        return request(app)
+        .post(`/api/reviews/${review_id}/comments`)
+        .send(newComment)
+        .expect(403)
+        .then((body) => {
+            expect(body.text).toEqual(`body is empty`)
+        })
+    })
+})
+
+// username does not exist
+// nothing to post, comment body is empty 

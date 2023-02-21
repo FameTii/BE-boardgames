@@ -47,3 +47,25 @@ exports.fetchReviewsWithId = (review_id) => {
     })
 }
 
+exports.postingComment = (review_id, newComment) => {
+    const username = newComment.username
+    const body = newComment.body
+    if (body === '' || body === undefined){
+        return Promise.reject({
+            status: 403,
+            msg: `body is empty`
+        })
+    }
+    const queryStr = `INSERT INTO comments (body, review_id, author) VALUES ('${body}', ${review_id}, '${username}') RETURNING *;`
+    return db.query(queryStr).then((result) => {
+        const comment = result.rows[0]
+        if (comment === undefined) {
+            return Promise.reject({
+                status: 403,
+                msg: `unable to post`
+            })
+        } else {
+            return comment
+        }
+    })
+}
