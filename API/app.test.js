@@ -115,6 +115,7 @@ describe('Get GET /api/reviews/:review_id/comments', () => {
             .get(`/api/reviews/${review_id}/comments`)
             .expect(200)
             .then(({body}) => {
+                expect(body.comments.length).toEqual(3)
                 expect(body.comments).toEqual(
                     [{
                         comment_id: 6,
@@ -144,6 +145,15 @@ describe('Get GET /api/reviews/:review_id/comments', () => {
                 expect(body.comments).toBeSortedBy('created_at', {descending: true});
             })
     })
+    it("should respond with 200 empty array if review exists but no comments", () => {
+        return request(app)
+        .get(`/api/reviews/1/comments`)
+        .expect(200)
+        .then(({body}) => {
+            expect(body.comments.length).toEqual(0)
+            expect(body.comments).toEqual([])
+        })    
+    }) 
     it("should respond with 404 and comment not found", () => {
         return request(app)
         .get(`/api/reviews/50/comments`)
@@ -163,3 +173,4 @@ describe('Get GET /api/reviews/:review_id/comments', () => {
 })
 
 
+// SELECT comment_id, body, comments.review_id, author, comments.votes, comments.created_at FROM comments RIGHT JOIN reviews ON reviews.review_id = comments.review_id WHERE reviews.review_id = 1;
