@@ -20,9 +20,6 @@ exports.PSQLhandlers = (err, req, res, next) => {
     }
     next(err)
 }
-  
-
-
 
 exports.handle500statuses = (err, req, res, next) => {
     res.status(500).send("Server Error!");

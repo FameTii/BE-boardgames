@@ -1,4 +1,3 @@
-const { readSync } = require('fs');
 const db = require('../db/connection')
 
 exports.fetchCategories = () => {
@@ -64,9 +63,18 @@ exports.fetchCommentsOfReviewId = (review_id) => {
     })
 }
 
-// SELECT * FROM comments WHERE review_id = 3 ORDER BY created_at DESC;
-
-    // \c nc_games_test;
-
-    // then(({body}) => {
-    //     expect(typeof body).toEqual({
+exports.updatingReviewVotes = (review_id, newVotes) => {
+    const voteValue = newVotes.inc_votes
+    const queryStr = `UPDATE reviews SET votes = votes + ${voteValue} WHERE review_id = ${review_id} RETURNING *`
+    return db.query(queryStr).then((result) => {
+        const review = result.rows[0]
+        if (review === undefined) {
+            return Promise.reject({
+                status: 404,
+                msg: `no review found`
+            })
+        } else {
+            return review
+        }
+    })
+}
