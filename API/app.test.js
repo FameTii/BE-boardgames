@@ -3,7 +3,6 @@ const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
-const {toBeSortedBy} = require('jest-sorted');
 
 beforeEach(() => seed(testData));
 
@@ -201,5 +200,146 @@ describe.only('POST /api/reviews/:review_id/comments', () => {
     })
 })
 
-// username does not exist
-// nothing to post, comment body is empty 
+describe('Get GET /api/reviews/:review_id/comments', () => {
+    it('responds with 200 and returns an array of comments for the given review_id', () => {
+        const review_id = 3
+        return request(app)
+            .get(`/api/reviews/${review_id}/comments`)
+            .expect(200)
+            .then(({body}) => {
+                expect(body.comments.length).toEqual(3)
+                expect(body.comments).toEqual(
+                    [{
+                        comment_id: 6,
+                        body: 'Not sure about dogs, but my cat likes to get involved with board games, the boxes are their particular favourite',
+                        review_id: 3,
+                        author: 'philippaclaire9',
+                        votes: 10,
+                        created_at: '2021-03-27T19:49:48.110Z'
+                      },
+                      {
+                        comment_id: 3,
+                        body: "I didn't know dogs could play games",
+                        review_id: 3,
+                        author: 'philippaclaire9',
+                        votes: 10,
+                        created_at: '2021-01-18T10:09:48.110Z'
+                      },
+                      {
+                        comment_id: 2,
+                        body: 'My dog loved this game too!',
+                        review_id: 3,
+                        author: 'mallionaire',
+                        votes: 13,
+                        created_at: '2021-01-18T10:09:05.410Z'
+                      }]
+                )
+                expect(body.comments).toBeSortedBy('created_at', {descending: true});
+            })
+    })
+    it("should respond with 200 empty array if review exists but no comments", () => {
+        return request(app)
+        .get(`/api/reviews/1/comments`)
+        .expect(200)
+        .then(({body}) => {
+            expect(body.comments.length).toEqual(0)
+            expect(body.comments).toEqual([])
+        })    
+    }) 
+    it("should respond with 404 and comment not found", () => {
+        return request(app)
+        .get(`/api/reviews/50/comments`)
+        .expect(404)
+        .then((body) => {
+            expect(body.text).toEqual(`no comments found`);
+            });
+    }) 
+    it("should respond with 400 and bad request", () => {
+        return request(app)
+          .get(`/api/reviews/bake/comments`)
+          .expect(400)
+          .then(( body) => {
+            expect(body.text).toEqual(`bad request`);
+          });
+      })
+})
+
+describe('PATCH /api/reviews/:review_id', () => {
+    it('responds with 200: updates the votes with positive value and returns the updated review', () => {
+        const review_id = 3
+        const newVotes = { inc_votes : 1 }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(200)
+        .then(({body}) => {
+            expect(body).toMatchObject({
+                review_id: 3,
+                title: 'Ultimate Werewolf',
+                review_body: `We couldn't find the werewolf!`,
+                category: 'social deduction',
+                designer: 'Akihisa Okui',
+                owner: 'bainesface',
+                review_img_url: 'https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?w=700&h=700',
+                created_at: '2021-01-18T10:01:41.251Z',
+                votes: 6
+            })
+        })
+    })
+    it('responsed with 200: updates the votes with negative value and returns updated review', () => {
+        const review_id = 3
+        const newVotes = { inc_votes : -10 }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(200)
+        .then(({body}) => {
+            expect(body).toMatchObject({
+                review_id: 3,
+                title: 'Ultimate Werewolf',
+                review_body: `We couldn't find the werewolf!`,
+                category: 'social deduction',
+                designer: 'Akihisa Okui',
+                owner: 'bainesface',
+                review_img_url: 'https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?w=700&h=700',
+                created_at: '2021-01-18T10:01:41.251Z',
+                votes: -5
+            })
+        })
+    })
+    it("should respond with 404 and review not found", () => {
+        const review_id = 50;
+        const newVotes = { inc_votes : 5 }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(404)
+        .then(( body) => {
+            expect(body.text).toEqual(`no review found`);
+            });
+    }) 
+    it("should respond with 400 and bad request", () => {
+        const review_id = 'egg'
+        const newVotes = { inc_votes : 5 }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(400)
+        .then(( body) => {
+            expect(body.text).toEqual(`bad request`);
+          });
+    })
+    it("should respond with 400 and bad request if inc_votes is not a integer", () => {
+        const review_id = 3
+        const newVotes = { inc_votes : 'egg' }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(400)
+        .then((body) => {
+            expect(body.text).toEqual(`bad request`)
+        })
+    })
+})    
+
+      
