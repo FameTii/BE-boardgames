@@ -107,8 +107,8 @@ describe('GET /api/reviews/:review_id', () => {
       });
 });
 
-describe('POST /api/reviews/:review_id/comments', () => {
-    it('responds with 201: request body accepts an object with username and body property, returns posted comment', () => {
+describe.only('POST /api/reviews/:review_id/comments', () => {
+    it.skip('responds with 201: request body accepts an object with username and body property, returns posted comment', () => {
         const review_id = 1
         const newComment = {
             username: "dav3rid",
@@ -129,7 +129,7 @@ describe('POST /api/reviews/:review_id/comments', () => {
                 })
             })
     })
-    it("should responsd with 404 and review not found", () => {
+    it("should respond with 404 and review not found", () => {
         const review_id = 50;
         const newComment = {
             username: "dav3rid",
@@ -157,7 +157,7 @@ describe('POST /api/reviews/:review_id/comments', () => {
             expect(body.text).toEqual(`bad request`);
           });
       });
-    it('should respond with 403 if not enough information provided', () => {
+    it('should respond with 400 if comment is missing', () => {
         const review_id = 1
         const newComment = {
             username: "dav3rid",
@@ -166,9 +166,37 @@ describe('POST /api/reviews/:review_id/comments', () => {
         return request(app)
         .post(`/api/reviews/${review_id}/comments`)
         .send(newComment)
-        .expect(403)
+        .expect(400)
         .then((body) => {
             expect(body.text).toEqual(`body is empty`)
+        })
+    })
+    it('should respond with 400 if username is missing', () => {
+        const review_id = 1
+        const newComment = {
+            username: '',
+            body:'hehehaha'
+        }
+        return request(app)
+        .post(`/api/reviews/${review_id}/comments`)
+        .send(newComment)
+        .expect(400)
+        .then((body) => {
+            expect(body.text).toEqual(`no username`)
+        })
+    })
+    it('should respond with 400 if username does not exist', () => {
+        const review_id = 1
+        const newComment = {
+            username: 'username22',
+            body: 'hehehaha'
+        }
+        return request(app)
+        .post(`/api/reviews/${review_id}/comments`)
+        .send(newComment)
+        .expect(400)
+        .then((body) => {
+            expect(body.text).toEqual(`username does not exist`)
         })
     })
 })

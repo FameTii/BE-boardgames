@@ -52,20 +52,29 @@ exports.postingComment = (review_id, newComment) => {
     const body = newComment.body
     if (body === '' || body === undefined){
         return Promise.reject({
-            status: 403,
+            status: 400,
             msg: `body is empty`
         })
     }
+    if (username === '' || username === undefined) {
+        return Promise.reject({
+            status: 400,
+            msg: `no username`
+        })
+    }
+
     const queryStr = `INSERT INTO comments (body, review_id, author) VALUES ('${body}', ${review_id}, '${username}') RETURNING *;`
     return db.query(queryStr).then((result) => {
         const comment = result.rows[0]
         if (comment === undefined) {
             return Promise.reject({
-                status: 403,
-                msg: `unable to post`
+                status: 400,
+                msg: `username not found`
             })
         } else {
             return comment
         }
     })
 }
+
+// INSERT INTO comments (body, review_id, author) VALUES ('ok', 1, 'bladibla') RETURNING *;
