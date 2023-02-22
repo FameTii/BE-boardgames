@@ -1,5 +1,5 @@
 // const categories = require("../db/data/development-data/categories");
-const { fetchCategories, fetchReviews, fetchReviewsWithId, updatingReviewVotes} = require("./models");
+const { fetchCategories, fetchReviews, fetchReviewsWithId, updatingReviewVotes, fetchCommentsOfReviewId} = require("./models");
 
 exports.getCategories = (req, res, next) => {
   fetchCategories()
@@ -26,6 +26,18 @@ exports.getReviewsWithId = (req, res, next) => {
     fetchReviewsWithId(review_id)
         .then((review) => {
             res.status(200).send({review})
+        })
+        .catch((err) => {
+            next(err)
+        })
+}
+
+exports.getCommentsOfReviewId = (req, res, next) => {
+    const {review_id} = req.params
+    fetchCommentsOfReviewId(review_id)
+        .then((comments) => {
+            // console.log(comments);
+            res.status(200).send({comments})
         })
         .catch((err) => {
             next(err)
