@@ -47,3 +47,20 @@ exports.fetchReviewsWithId = (review_id) => {
     })
 }
 
+exports.updatingReviewVotes = (review_id, newVotes) => {
+    const voteValue = newVotes.inc_votes
+    const queryStr = `UPDATE reviews SET votes = votes + ${voteValue} WHERE review_id = ${review_id} RETURNING *`
+    return db.query(queryStr).then((result) => {
+        const review = result.rows[0]
+        if (review === undefined) {
+            return Promise.reject({
+                status: 404,
+                msg: `no review found`
+            })
+        } else {
+            return review
+        }
+    })
+}
+
+// UPDATE reviews SET votes = votes + 1 WHERE review_id = 2 RETURNING *;

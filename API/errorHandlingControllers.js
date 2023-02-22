@@ -13,7 +13,6 @@ exports.handlesIncorrectReviewIds = (err, req, res, next) => {
 
 exports.PSQLhandlers = (err, req, res, next) => {
     const errs = ['42703', '22P02']
-    // console.log(err.code);
     if(errs.includes(err.code)) {
         res.status(400).send("bad request")
     }

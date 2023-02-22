@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
 const {toBeSortedBy} = require('jest-sorted');
-const { expect } = require("@jest/globals");
 
 beforeEach(() => seed(testData));
 
@@ -108,5 +107,83 @@ describe('GET /api/reviews/:review_id', () => {
       });
 });
     
+
+describe.only('PATCH /api/reviews/:review_id', () => {
+    it('responds with 200: updates the votes with positive value and returns the updated review', () => {
+        const review_id = 3
+        const newVotes = { inc_votes : 1 }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(200)
+        .then(({body}) => {
+            expect(body).toMatchObject({
+                review_id: 3,
+                title: 'Ultimate Werewolf',
+                review_body: `We couldn't find the werewolf!`,
+                category: 'social deduction',
+                designer: 'Akihisa Okui',
+                owner: 'bainesface',
+                review_img_url: 'https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?w=700&h=700',
+                created_at: '2021-01-18T10:01:41.251Z',
+                votes: 6
+            })
+        })
+    })
+    it('responsed with 200: updates the votes with negative value and returns updated review', () => {
+        const review_id = 3
+        const newVotes = { inc_votes : -10 }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(200)
+        .then(({body}) => {
+            expect(body).toMatchObject({
+                review_id: 3,
+                title: 'Ultimate Werewolf',
+                review_body: `We couldn't find the werewolf!`,
+                category: 'social deduction',
+                designer: 'Akihisa Okui',
+                owner: 'bainesface',
+                review_img_url: 'https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?w=700&h=700',
+                created_at: '2021-01-18T10:01:41.251Z',
+                votes: -5
+            })
+        })
+    })
+    it("should respond with 404 and review not found", () => {
+        const review_id = 50;
+        const newVotes = { inc_votes : 5 }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(404)
+        .then(( body) => {
+            expect(body.text).toEqual(`no review found`);
+            });
+    }) 
+    it("should respond with 400 and bad request", () => {
+        const review_id = 'egg'
+        const newVotes = { inc_votes : 5 }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(400)
+        .then(( body) => {
+            expect(body.text).toEqual(`bad request`);
+          });
+    })
+    it("should respond with 400 and bad request if inc_votes is not a integer", () => {
+        const review_id = 3
+        const newVotes = { inc_votes : 'egg' }
+        return request(app)
+        .patch(`/api/reviews/${review_id}`)
+        .send(newVotes)
+        .expect(400)
+        .then((body) => {
+            expect(body.text).toEqual(`bad request`)
+        })
+    })
+})    
 
       
