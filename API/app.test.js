@@ -171,7 +171,7 @@ describe('Get GET /api/reviews/:review_id/comments', () => {
       })
 })
 
-describe.only('PATCH /api/reviews/:review_id', () => {
+describe('PATCH /api/reviews/:review_id', () => {
     it('responds with 200: updates the votes with positive value and returns the updated review', () => {
         const review_id = 3
         const newVotes = { inc_votes : 1 }
