@@ -89,7 +89,7 @@ describe('GET /api/reviews/:review_id', () => {
                 })
             })
         })
-    it("should response with 404 and review not found", () => {
+    it("should respond with 404 and review not found", () => {
         const review_id = 50;
         return request(app)
         .get(`/api/reviews/${review_id}`)
@@ -98,7 +98,7 @@ describe('GET /api/reviews/:review_id', () => {
             expect(body.text).toEqual(`no review found`);
             });
     }) 
-    it("should response with 400 and bad request", () => {
+    it("should respond with 400 and bad request", () => {
         return request(app)
           .get(`/api/reviews/egg`)
           .expect(400)
@@ -108,5 +108,69 @@ describe('GET /api/reviews/:review_id', () => {
       });
 });
     
+describe('Get GET /api/reviews/:review_id/comments', () => {
+    it('responds with 200 and returns an array of comments for the given review_id', () => {
+        const review_id = 3
+        return request(app)
+            .get(`/api/reviews/${review_id}/comments`)
+            .expect(200)
+            .then(({body}) => {
+                expect(body.comments.length).toEqual(3)
+                expect(body.comments).toEqual(
+                    [{
+                        comment_id: 6,
+                        body: 'Not sure about dogs, but my cat likes to get involved with board games, the boxes are their particular favourite',
+                        review_id: 3,
+                        author: 'philippaclaire9',
+                        votes: 10,
+                        created_at: '2021-03-27T19:49:48.110Z'
+                      },
+                      {
+                        comment_id: 3,
+                        body: "I didn't know dogs could play games",
+                        review_id: 3,
+                        author: 'philippaclaire9',
+                        votes: 10,
+                        created_at: '2021-01-18T10:09:48.110Z'
+                      },
+                      {
+                        comment_id: 2,
+                        body: 'My dog loved this game too!',
+                        review_id: 3,
+                        author: 'mallionaire',
+                        votes: 13,
+                        created_at: '2021-01-18T10:09:05.410Z'
+                      }]
+                )
+                expect(body.comments).toBeSortedBy('created_at', {descending: true});
+            })
+    })
+    it("should respond with 200 empty array if review exists but no comments", () => {
+        return request(app)
+        .get(`/api/reviews/1/comments`)
+        .expect(200)
+        .then(({body}) => {
+            expect(body.comments.length).toEqual(0)
+            expect(body.comments).toEqual([])
+        })    
+    }) 
+    it("should respond with 404 and comment not found", () => {
+        return request(app)
+        .get(`/api/reviews/50/comments`)
+        .expect(404)
+        .then((body) => {
+            expect(body.text).toEqual(`no comments found`);
+            });
+    }) 
+    it("should respond with 400 and bad request", () => {
+        return request(app)
+          .get(`/api/reviews/bake/comments`)
+          .expect(400)
+          .then(( body) => {
+            expect(body.text).toEqual(`bad request`);
+          });
+      })
+})
 
-      
+
+// SELECT comment_id, body, comments.review_id, author, comments.votes, comments.created_at FROM comments RIGHT JOIN reviews ON reviews.review_id = comments.review_id WHERE reviews.review_id = 1;
