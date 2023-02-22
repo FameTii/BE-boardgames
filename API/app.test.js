@@ -249,4 +249,31 @@ describe('PATCH /api/reviews/:review_id', () => {
     })
 })    
 
-      
+describe.only('GET /api/users', () => {
+    it('responds with 200 and return an array of user objects', () => {
+        return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({body}) => {
+            expect(body.users).toHaveLength(4)
+            const {users} = body
+            expect(body.users).toBeInstanceOf(Array);
+            users.forEach((category) => {
+                expect(category).toMatchObject({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String)
+                })
+            })
+        })
+
+    })
+    it("should respond with 404 and message if route does not exist", () => {
+        return request(app)
+          .get("/api/userssss")
+          .expect(404)
+          .then((body) => {
+            expect(body.text).toEqual(`route does not exist`);
+          })
+      });
+})

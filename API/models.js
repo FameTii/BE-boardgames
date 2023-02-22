@@ -78,3 +78,17 @@ exports.updatingReviewVotes = (review_id, newVotes) => {
         }
     })
 }
+
+exports.fetchUsers = () => {
+    const queryStr = `SELECT * FROM users`
+    return db.query(queryStr).then((result) => {
+        const users = result.rows
+        if (users === undefined) {
+            return Promise.reject({
+                status: 404,
+                msg: 'route does not exist'
+            })
+        }
+        return users
+    })
+}
