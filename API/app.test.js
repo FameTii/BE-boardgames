@@ -369,4 +369,89 @@ describe.only('GET /api/users', () => {
             expect(body.text).toEqual(`route does not exist`);
           })
       });
+      
+describe("GET /api/reviews?queries", () => {
+    it("should respond with 200 and return all reviews based on category value specified in the query", () => {
+      const category = 'euro game'
+      return request(app)
+        .get(`/api/reviews?category=${category}`)
+        .expect(200)
+        .then(({ body }) => {
+            expect(body.reviews[0]).toMatchObject({
+                review_id: 1,
+                title: 'Agricola',
+                category: 'euro game',
+                designer: 'Uwe Rosenberg',
+                owner: 'mallionaire',
+                review_img_url: 'https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700',
+                created_at: expect.any(String),
+                votes: 1, 
+                comment_count: 0
+            })
+        })
+    })
+    it("should respond with 200 and return all reviews based on category value specified in the query in ascending order", () => {
+        const sortBy = 'votes';
+        const orderBy = 'ASC'
+        return request(app)
+          .get(`/api/reviews?sortBy=${sortBy}&orderBy=${orderBy}`)
+          .expect(200)
+          .then(({ body }) => {
+              const {reviews} = body 
+              expect(reviews[0].votes).toEqual(1)
+              expect(reviews[12].votes).toEqual(100)
+              expect(reviews).toHaveLength(13)
+        })
+    })
+    it('should respond with 200 and return all reviews if no category specified, and sorts articles by dates in descending order as default', () => {
+        return request(app)
+            .get(`/api/reviews`)
+            .expect(200)
+            .then(({body}) => {expect(typeof body).toBe('object')
+            const {reviews} = body
+            expect(body.reviews).toBeInstanceOf(Array);
+            reviews.forEach((review) => {
+                expect(review).toMatchObject({
+                    review_id: expect.any(Number),
+                    title: expect.any(String),
+                    category: expect.any(String),
+                    designer: expect.any(String),
+                    owner: expect.any(String),
+                    review_img_url: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(Number)
+                })
+                expect(reviews).toHaveLength(13)
+            })
+            expect(reviews).toBeSortedBy('created_at', {descending: true});
+        })
+    })
+    it.only('should respond with 404 not found if user tries to get articles by non existant categories', () => {
+        const category = 'egg'
+        return request(app)
+            .get(`/api/reviews?category=${category}`)
+            .expect(404)
+            .then((body) => {
+                expect(body.text).toEqual(`no category found`)
+            })
+    })
+    it('should respond with 400 bad request if user tries to sort articles by invalid columns', () => {
+        const sortBy = 'title'
+        return request(app)
+            .get(`/api/reviews?sortBy=${sortBy}`)
+            .expect(400)
+            .then((body) => {
+                expect(body.text).toEqual(`bad request`)
+            })
+    })
+    it('should respond with 400 and bad order request if order is not asc or desc', () => {
+        const orderBy = 'egg'
+        return request(app)
+        .get(`/api/reviews?&orderBy=${orderBy}`)
+        .expect(400)
+        .then((body) => {
+            expect(body.text).toEqual(`bad request`)
+        })
+    })
 })

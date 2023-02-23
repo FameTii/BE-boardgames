@@ -13,16 +13,45 @@ exports.fetchCategories = () => {
       });
 }
 
-exports.fetchReviews = () => {
-    const queryStr = `SELECT reviews.review_id, reviews.title, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.votes,
+exports.fetchReviews = (category, sortBy = 'created_at', orderBy= 'DESC') => {
+    const validSortByOptions = ['review_id', 'created_at', 'votes']
+    const validOrderByOptions = ['ASC', 'DESC']
+    const where = `WHERE category = '${category}' `
+    const order = `GROUP BY reviews.review_id ORDER BY reviews.${sortBy} ${orderBy}`;
+
+    let queryStr = `SELECT reviews.review_id, reviews.title, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.votes,
     COUNT (comments.review_id)::int AS comment_count
     FROM reviews
-    LEFT JOIN comments ON reviews.review_id = comments.review_id
-    GROUP BY reviews.review_id
-    ORDER BY reviews.created_at DESC
-    `
+    LEFT JOIN comments ON reviews.review_id = comments.review_id `
+
+    if (category !== undefined ){
+        queryStr += where
+    };
+
+    if (sortBy && !validSortByOptions.includes(sortBy)) {
+        return Promise.reject({ 
+            status: 400, 
+            msg: "bad request"});
+    }
+
+    if (orderBy && !validOrderByOptions.includes(orderBy)) {
+        return Promise.reject({
+            status: 400, 
+            msg: "bad request"
+        })
+    }
+    queryStr += order;
+
+    
     return db.query(queryStr).then((result) => {
-        return result.rows;
+        if (result.rowCount === 0){
+            return Promise.reject({
+                status: 404,
+                msg: "no category found"
+            })
+        }else{
+            return result.rows;
+        }
     })
 }
 

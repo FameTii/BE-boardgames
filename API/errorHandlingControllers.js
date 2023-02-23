@@ -4,8 +4,6 @@ exports.handlesIncorrectPaths =
     res.status(404).send("route does not exist");
   });
 
-
-
 exports.dataErrors = (err, req, res, next) => {
   if (err.msg === `body is empty`) {
     res.status(400).send(err.msg)
@@ -16,7 +14,7 @@ exports.dataErrors = (err, req, res, next) => {
 };
 
 exports.PSQLhandlers = (err, req, res, next) => {
-  const errs = ["42703", "22P02"];
+  const errs = ["42703", "22P02", "42601"];
   const usererrs = ["23503"];
   if (errs.includes(err.code)) {
     res.status(400).send("bad request");
@@ -24,7 +22,7 @@ exports.PSQLhandlers = (err, req, res, next) => {
     res.status(404).send('username does not exist');
   } else if (usererrs.includes(err.code) && err.detail.includes('is not present in table "reviews".')) {
     res.status(404).send("cannot find review_id");
-  }
+  } 
   next(err);
 };
   
@@ -33,6 +31,8 @@ exports.handlesIncorrectReviewIds = (err, req, res, next) => {
         res.status(404).send("no review found");
     } else if (err.msg === `no comments found`) {
         res.status(404).send("no comments found") 
+    } else if (err.msg === `no category found`){
+        res.status(404).send(`no category found`)
     } else {
         res.status(404)
         }
