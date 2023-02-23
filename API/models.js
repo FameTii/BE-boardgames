@@ -151,3 +151,16 @@ exports.fetchUsers = () => {
         return users
     })
 }
+
+exports.deletingUsers = (comment_id) => {
+    const queryStr = `DELETE FROM comments where comment_id=${comment_id} RETURNING *`
+    return db.query(queryStr).then((result) => {
+        const comment = result.rows
+        if(comment.length === 0){
+            return Promise.reject({
+                status: 404,
+                msg: 'comment_id does not exist'
+            })
+        } 
+    })
+}

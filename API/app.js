@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 app.use(express.json())
 
-const { getCategories, getReviews, getReviewsWithId, getCommentsOfReviewId, updateReviewVotes, getUsers, postComment } = require("./controller");
+const { getCategories, getReviews, getReviewsWithId, getCommentsOfReviewId, updateReviewVotes, getUsers, postComment, deleteComment } = require("./controller");
 const { handlesIncorrectPaths, handleCustomErrors, PSQLhandlers, handle500statuses, dataErrors } = require("./errorHandlingControllers")
 
 app.get("/api/categories", getCategories);
@@ -18,6 +18,8 @@ app.post("/api/reviews/:review_id/comments", postComment);
 app.patch("/api/reviews/:review_id", updateReviewVotes);
 
 app.get("/api/users", getUsers)
+
+app.delete("/api/comments/:comment_id", deleteComment)
 
 app.use(handlesIncorrectPaths)
 app.use(handleCustomErrors)
