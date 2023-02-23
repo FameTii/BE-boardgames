@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
 const {toBeSortedBy} = require('jest-sorted');
-const { expect } = require("@jest/globals");
 
 beforeEach(() => seed(testData));
 
@@ -250,7 +249,7 @@ describe('PATCH /api/reviews/:review_id', () => {
     })
 })    
 
-describe.only("GET /api/reviews?queries", () => {
+describe("GET /api/reviews?queries", () => {
     it("should respond with 200 and return all reviews based on category value specified in the query", () => {
       const category = 'euro game'
       return request(app)
@@ -277,7 +276,6 @@ describe.only("GET /api/reviews?queries", () => {
           .get(`/api/reviews?sortBy=${sortBy}&orderBy=${orderBy}`)
           .expect(200)
           .then(({ body }) => {
-            // console.log(body);
               const {reviews} = body 
               expect(reviews[0].votes).toEqual(1)
               expect(reviews[12].votes).toEqual(100)
@@ -308,98 +306,22 @@ describe.only("GET /api/reviews?queries", () => {
             expect(reviews).toBeSortedBy('created_at', {descending: true});
         })
     })
+    it('should respond with 400 bad request if user tries to sort articles by invalid columns', () => {
+        const sortBy = 'title'
+        return request(app)
+            .get(`/api/reviews?sortBy=${sortBy}`)
+            .expect(400)
+            .then((body) => {
+                expect(body.text).toEqual(`bad request`)
+            })
+    })
+    it('should respond with 400 and bad order request if order is not asc or desc', () => {
+        const orderBy = 'egg'
+        return request(app)
+        .get(`/api/reviews?&orderBy=${orderBy}`)
+        .expect(400)
+        .then((body) => {
+            expect(body.text).toEqual(`bad request`)
+        })
+    })
 })
-
-
-
-// .get('/api/reviews')
-//             .expect(200)
-//             .then(({body}) => {
-//                 expect(typeof body).toBe('object')
-//                 const {reviews} = body
-//                 expect(body.reviews).toBeInstanceOf(Array);
-//                 reviews.forEach((review) => {
-//                     expect(review).toMatchObject({
-//                         review_id: expect.any(Number),
-//                         title: expect.any(String),
-//                         category: expect.any(String),
-//                         designer: expect.any(String),
-//                         owner: expect.any(String),
-//                         review_img_url: expect.any(String),
-//                         created_at: expect.any(String),
-//                         votes: expect.any(Number),
-//                         comment_count: expect.any(Number)
-//                     })
-//                     expect(reviews).toHaveLength(13)
-//                 })
-//                 expect(reviews).toBeSortedBy('created_at', {descending: true});
-//             })
-//     })
-// })
-
-// describe('GET /api/reviews/:review_id', () => {
-//     it('responds with 200 and returns an object according to review_id', () => {
-//         const review_id = 3
-//         return request(app)
-//             .get(`/api/reviews/${review_id}`)
-//             .expect(200)
-//             .then(({body}) => {
-//                 expect(typeof body).toBe('object')
-//                 expect(body.review).toEqual({
-//                     review_id: 3,
-//                     title: 'Ultimate Werewolf',
-//                     review_body: `We couldn't find the werewolf!`,
-//                     category: 'social deduction',
-//                     designer: 'Akihisa Okui',
-//                     owner: 'bainesface',
-//                     review_img_url: 'https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?w=700&h=700',
-//                     created_at: '2021-01-18T10:01:41.251Z',
-//                     votes: 5
-//                 })
-//             })
-//         })
-//     })
-
-// expect(typeof body).toBe('object')
-//                 const {reviews} = body
-//                 expect(body.reviews).toBeInstanceOf(Array);
-//                 reviews.forEach((review) => {
-//                     expect(review).toMatchObject({
-//                         review_id: expect.any(Number),
-//                         title: expect.any(String),
-//                         category: expect.any(String),
-//                         designer: expect.any(String),
-//                         owner: expect.any(String),
-//                         review_img_url: expect.any(String),
-//                         created_at: expect.any(String),
-//                         votes: expect.any(Number),
-//                         comment_count: expect.any(Number)
-//                     })
-//                     expect(reviews).toHaveLength(13)
-//                 })
-//                 expect(reviews).toBeSortedBy('created_at', {descending: true});
-
-// .get('/api/reviews')
-//             .expect(200)
-//             .then(({body}) => {
-//                 expect(typeof body).toBe('object')
-//                 const {reviews} = body
-//                 expect(body.reviews).toBeInstanceOf(Array);
-//                 reviews.forEach((review) => {
-//                     expect(review).toMatchObject({
-//                         review_id: expect.any(Number),
-//                         title: expect.any(String),
-//                         category: expect.any(String),
-//                         designer: expect.any(String),
-//                         owner: expect.any(String),
-//                         review_img_url: expect.any(String),
-//                         created_at: expect.any(String),
-//                         votes: expect.any(Number),
-//                         comment_count: expect.any(Number)
-//                     })
-//                     expect(reviews).toHaveLength(13)
-//                 })
-//                 expect(reviews).toBeSortedBy('created_at', {descending: true});
-//             })
-//     })
-// })
