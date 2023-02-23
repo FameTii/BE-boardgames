@@ -466,7 +466,6 @@ describe("GET /api/reviews/:review_id with comment count", () => {
             .expect(200)
             .then(({body}) => {
                 expect(typeof body).toBe('object')
-                console.log(body.review);
                 expect(body.review).toEqual({
                     review_id: 3,
                     title: 'Ultimate Werewolf',
