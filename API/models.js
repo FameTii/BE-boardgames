@@ -42,8 +42,16 @@ exports.fetchReviews = (category, sortBy = 'created_at', orderBy= 'DESC') => {
     }
     queryStr += order;
 
+    
     return db.query(queryStr).then((result) => {
-        return result.rows;
+        if (result.rowCount === 0){
+            return Promise.reject({
+                status: 404,
+                msg: "no category found"
+            })
+        }else{
+            return result.rows;
+        }
     })
 }
 

@@ -7,10 +7,11 @@ exports.handlesIncorrectReviewIds = (err, req, res, next) => {
         res.status(404).send("no review found");
     } else if (err.msg === `no comments found`) {
         res.status(404).send("no comments found") 
+    } else if (err.msg === `no category found`){
+        res.status(404).send(`no category found`)
     } else {
-        res.status(404)
+        next(err)
     }
-    next(err)
 }
     
 exports.PSQLhandlers = (err, req, res, next) => {

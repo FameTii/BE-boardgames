@@ -306,6 +306,15 @@ describe("GET /api/reviews?queries", () => {
             expect(reviews).toBeSortedBy('created_at', {descending: true});
         })
     })
+    it.only('should respond with 404 not found if user tries to get articles by non existant categories', () => {
+        const category = 'egg'
+        return request(app)
+            .get(`/api/reviews?category=${category}`)
+            .expect(404)
+            .then((body) => {
+                expect(body.text).toEqual(`no category found`)
+            })
+    })
     it('should respond with 400 bad request if user tries to sort articles by invalid columns', () => {
         const sortBy = 'title'
         return request(app)
