@@ -75,7 +75,7 @@ describe('GET /api/reviews/:review_id', () => {
             .expect(200)
             .then(({body}) => {
                 expect(typeof body).toBe('object')
-                expect(body.review).toEqual({
+                expect(body.review).toMatchObject({
                     review_id: 3,
                     title: 'Ultimate Werewolf',
                     review_body: `We couldn't find the werewolf!`,
@@ -462,14 +462,15 @@ describe("GET /api/reviews/:review_id with comment count", () => {
     it('should respond with 200 and return object according to review_id with comment count included', () => {
         const review_id = 3
         return request(app)
-            .get(`/api/reviews/${review_id}?comment_count=true`)
+            .get(`/api/reviews/${review_id}`)
             .expect(200)
             .then(({body}) => {
                 expect(typeof body).toBe('object')
+                console.log(body.review);
                 expect(body.review).toEqual({
                     review_id: 3,
                     title: 'Ultimate Werewolf',
-                    review_body: `We couldn't find the werewolf!`,
+                    review_body: "We couldn't find the werewolf!",
                     category: 'social deduction',
                     designer: 'Akihisa Okui',
                     owner: 'bainesface',
@@ -480,46 +481,6 @@ describe("GET /api/reviews/:review_id with comment count", () => {
                 })
             })
         })
-    it('should respond with 200 and return object according to review_id without comment count included', () => {
-        const review_id = 3
-        return request(app)
-            .get(`/api/reviews/${review_id}?comment_count=false`)
-            .expect(200)
-            .then(({body}) => {
-                expect(typeof body).toBe('object')
-                expect(body.review).toEqual({
-                    review_id: 3,
-                    title: 'Ultimate Werewolf',
-                    review_body: `We couldn't find the werewolf!`,
-                    category: 'social deduction',
-                    designer: 'Akihisa Okui',
-                    owner: 'bainesface',
-                    review_img_url: 'https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?w=700&h=700',
-                    created_at: '2021-01-18T10:01:41.251Z',
-                    votes: 5,
-                    })
-                })
-            })
-    it('should respond with 200 and return object according to review_id without comment count query included', () => {
-        const review_id = 3
-        return request(app)
-            .get(`/api/reviews/${review_id}`)
-            .expect(200)
-            .then(({body}) => {
-                expect(typeof body).toBe('object')
-                expect(body.review).toEqual({
-                    review_id: 3,
-                    title: 'Ultimate Werewolf',
-                    review_body: `We couldn't find the werewolf!`,
-                    category: 'social deduction',
-                    designer: 'Akihisa Okui',
-                    owner: 'bainesface',
-                    review_img_url: 'https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?w=700&h=700',
-                    created_at: '2021-01-18T10:01:41.251Z',
-                    votes: 5,
-                    })
-                })
-            })
     it('should respond with 400 and review not found if review does not exist', () => {
         const review_id = 50
         return request(app)

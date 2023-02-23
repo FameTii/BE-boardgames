@@ -56,11 +56,10 @@ exports.fetchReviews = (category, sortBy = 'created_at', orderBy= 'DESC') => {
     })
 }
 
-exports.fetchReviewsWithId = (review_id, comment_count) => {
-    let comments = ``;
-    if (comment_count === 'true' ){
-        comments = `, COUNT (comments.review_id)::int AS comment_count`
-    }
+exports.fetchReviewsWithId = (review_id) => {
+    
+    const comments = `, COUNT (comments.review_id)::int AS comment_count`
+    
     const queryStr = `SELECT reviews.review_id, reviews.title, reviews.review_body, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.votes 
     ${comments}
     FROM reviews
