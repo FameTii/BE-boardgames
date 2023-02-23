@@ -13,14 +13,27 @@ exports.fetchCategories = () => {
       });
 }
 
-exports.fetchReviews = () => {
-    const queryStr = `SELECT reviews.review_id, reviews.title, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.votes,
+exports.fetchReviews = (category, sortBy = 'created_at', orderBy= 'DESC') => {
+    const validSortByOptions = ['review_id', 'created_at', 'votes']
+    const where = `WHERE category = '${category}'`
+    const order = `GROUP BY reviews.review_id ORDER BY reviews.${sortBy} ${orderBy}`;
+
+    let queryStr = `SELECT reviews.review_id, reviews.title, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.votes,
     COUNT (comments.review_id)::int AS comment_count
     FROM reviews
-    LEFT JOIN comments ON reviews.review_id = comments.review_id
-    GROUP BY reviews.review_id
-    ORDER BY reviews.created_at DESC
-    `
+    LEFT JOIN comments ON reviews.review_id = comments.review_id `
+    // if (sort_by && !validSortOptions.includes(sort_by)) {
+    //     return Promise.reject({ msg: "invalid sort_by option" });
+    //   }
+      
+    if (category !== undefined ){
+        queryStr += where
+    };
+
+    queryStr += order;
+
+    console.log(queryStr);
+
     return db.query(queryStr).then((result) => {
         return result.rows;
     })
