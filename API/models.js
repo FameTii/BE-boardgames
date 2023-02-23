@@ -74,6 +74,36 @@ exports.fetchReviewsWithId = (review_id) => {
     })
 }
 
+exports.postingComment = (review_id, newComment) => {
+    const username = newComment.username
+    const body = newComment.body
+    if (body === '' || body === undefined){
+        return Promise.reject({
+            status: 400,
+            msg: `body is empty`
+        })
+    }
+    if (username === '' || username === undefined) {
+        return Promise.reject({
+            status: 400,
+            msg: `no username`
+        })
+    }
+
+    const queryStr = `INSERT INTO comments (body, review_id, author) VALUES ('${body}', ${review_id}, '${username}') RETURNING *;`
+    return db.query(queryStr).then((result) => {
+        const comment = result.rows[0]
+        if (comment === undefined) {
+            return Promise.reject({
+                status: 400,
+                msg: `username not found`
+            })
+        } else {
+            return comment
+        }
+    })
+}
+
 exports.fetchCommentsOfReviewId = (review_id) => {
     const queryStr = `SELECT comment_id, body, comments.review_id, author, comments.votes, comments.created_at FROM comments RIGHT JOIN reviews ON reviews.review_id = comments.review_id WHERE reviews.review_id = ${review_id} 
     ORDER BY created_at DESC`
@@ -105,5 +135,19 @@ exports.updatingReviewVotes = (review_id, newVotes) => {
         } else {
             return review
         }
+    })
+}
+
+exports.fetchUsers = () => {
+    const queryStr = `SELECT * FROM users`
+    return db.query(queryStr).then((result) => {
+        const users = result.rows
+        if (users === undefined) {
+            return Promise.reject({
+                status: 404,
+                msg: 'route does not exist'
+            })
+        }
+        return users
     })
 }

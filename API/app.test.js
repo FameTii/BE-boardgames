@@ -3,7 +3,6 @@ const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
-const {toBeSortedBy} = require('jest-sorted');
 
 beforeEach(() => seed(testData));
 
@@ -106,7 +105,101 @@ describe('GET /api/reviews/:review_id', () => {
           });
       });
 });
-    
+
+describe.only('POST /api/reviews/:review_id/comments', () => {
+    it.skip('responds with 201: request body accepts an object with username and body property, returns posted comment', () => {
+        const review_id = 1
+        const newComment = {
+            username: "dav3rid",
+            body: "hahahehe"
+        }
+        return request(app) 
+            .post(`/api/reviews/${review_id}/comments`)
+            .send(newComment)
+            .expect(201)
+            .then(({body}) => {
+                expect(body).toMatchObject({
+                    comment_id: 7,
+                    body: 'hahahehe',
+                    review_id: 1,
+                    author: "dav3rid",
+                    votes: 0, 
+                    created_at: expect.any(String)
+                })
+            })
+    })
+    it("should respond with 404 and review not found", () => {
+        const review_id = 50;
+        const newComment = {
+            username: "dav3rid",
+            body:'hehehohoegg'
+        }
+        return request(app)
+        .post(`/api/reviews/${review_id}/comments`)
+        .send(newComment)
+        .expect(404)
+        .then(( body) => {
+            expect(body.text).toEqual(`cannot find review_id`);
+            });
+    }) 
+    it("should response with 400 and bad request", () => {
+        const review_id = 1
+        const newComment = {
+            username: "dav3rid",
+            body:'hehehohoegg'
+        }
+        return request(app)
+          .post(`/api/reviews/egg/comments`)
+          .send(newComment)
+          .expect(400)
+          .then(( body) => {
+            expect(body.text).toEqual(`bad request`);
+          });
+      });
+    it('should respond with 400 if comment is missing', () => {
+        const review_id = 1
+        const newComment = {
+            username: "dav3rid",
+            body:''
+        }
+        return request(app)
+        .post(`/api/reviews/${review_id}/comments`)
+        .send(newComment)
+        .expect(400)
+        .then((body) => {
+            expect(body.text).toEqual(`body is empty`)
+        })
+    })
+    it('should respond with 400 if username is missing', () => {
+        const review_id = 1
+        const newComment = {
+            username: '',
+            body:'hehehaha'
+        }
+        return request(app)
+        .post(`/api/reviews/${review_id}/comments`)
+        .send(newComment)
+        .expect(400)
+        .then((body) => {
+            expect(body.text).toEqual(`no username`)
+        })
+    })
+    it('should respond with 404 if username does not exist', () => {
+        const review_id = 1
+        const newComment = {
+            username: 'username22',
+            body: 'hehehaha'
+        }
+        return request(app)
+        .post(`/api/reviews/${review_id}/comments`)
+        .send(newComment)
+        .expect(404)
+        .then((body) => {
+            expect(body.text).toEqual(`username does not exist`)
+        })
+    })
+})
+
 describe('Get GET /api/reviews/:review_id/comments', () => {
     it('responds with 200 and returns an array of comments for the given review_id', () => {
         const review_id = 3
@@ -249,6 +342,34 @@ describe('PATCH /api/reviews/:review_id', () => {
     })
 })    
 
+describe.only('GET /api/users', () => {
+    it('responds with 200 and return an array of user objects', () => {
+        return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({body}) => {
+            expect(body.users).toHaveLength(4)
+            const {users} = body
+            expect(body.users).toBeInstanceOf(Array);
+            users.forEach((category) => {
+                expect(category).toMatchObject({
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String)
+                })
+            })
+        })
+
+    })
+    it("should respond with 404 and message if route does not exist", () => {
+        return request(app)
+          .get("/api/userssss")
+          .expect(404)
+          .then((body) => {
+            expect(body.text).toEqual(`route does not exist`);
+          })
+      });
+      
 describe("GET /api/reviews?queries", () => {
     it("should respond with 200 and return all reviews based on category value specified in the query", () => {
       const category = 'euro game'
