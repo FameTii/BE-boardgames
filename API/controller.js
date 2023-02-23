@@ -25,7 +25,8 @@ exports.getReviews = (req, res, next) => {
 
 exports.getReviewsWithId = (req, res, next) => {
     const {review_id} = req.params;
-    fetchReviewsWithId(review_id)
+    const {comment_count} = req.query
+    fetchReviewsWithId(review_id, comment_count)
         .then((review) => {
             res.status(200).send({review})
         })

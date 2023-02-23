@@ -1,4 +1,5 @@
-const db = require('../db/connection')
+const db = require('../db/connection');
+const comments = require('../db/data/test-data/comments');
 
 exports.fetchCategories = () => {
     const queryStr = `SELECT slug, description FROM categories`
@@ -55,8 +56,13 @@ exports.fetchReviews = (category, sortBy = 'created_at', orderBy= 'DESC') => {
     })
 }
 
-exports.fetchReviewsWithId = (review_id) => {
-    const queryStr = `SELECT reviews.review_id, reviews.title, reviews.review_body, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.votes
+exports.fetchReviewsWithId = (review_id, comment_count) => {
+    let comments = ``;
+    if (comment_count === 'true' ){
+        comments = `, COUNT (comments.review_id)::int AS comment_count`
+    }
+    const queryStr = `SELECT reviews.review_id, reviews.title, reviews.review_body, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.votes 
+    ${comments}
     FROM reviews
     LEFT JOIN comments ON reviews.review_id = comments.review_id
     WHERE reviews.review_id = ${review_id}
