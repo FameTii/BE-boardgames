@@ -35,6 +35,7 @@ exports.getReviewsWithId = (req, res, next) => {
 }
 
 exports.getCommentsOfReviewId = (req, res, next) => {
+    const {review_id} = req.params;
     fetchCommentsOfReviewId(review_id)
         .then((comments) => {
             res.status(200).send({comments})
