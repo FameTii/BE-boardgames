@@ -184,7 +184,7 @@ describe.only('POST /api/reviews/:review_id/comments', () => {
             expect(body.text).toEqual(`no username`)
         })
     })
-    it('should respond with 400 if username does not exist', () => {
+    it('should respond with 404 if username does not exist', () => {
         const review_id = 1
         const newComment = {
             username: 'username22',
@@ -193,7 +193,7 @@ describe.only('POST /api/reviews/:review_id/comments', () => {
         return request(app)
         .post(`/api/reviews/${review_id}/comments`)
         .send(newComment)
-        .expect(400)
+        .expect(404)
         .then((body) => {
             expect(body.text).toEqual(`username does not exist`)
         })

@@ -21,7 +21,7 @@ exports.PSQLhandlers = (err, req, res, next) => {
   if (errs.includes(err.code)) {
     res.status(400).send("bad request");
   } else if (usererrs.includes(err.code) && err.detail.includes('is not present in table "users".')) {
-    res.status(400).send('username does not exist');
+    res.status(404).send('username does not exist');
   } else if (usererrs.includes(err.code) && err.detail.includes('is not present in table "reviews".')) {
     res.status(404).send("cannot find review_id");
   }
