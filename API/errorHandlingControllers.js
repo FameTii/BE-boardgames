@@ -26,17 +26,19 @@ exports.PSQLhandlers = (err, req, res, next) => {
   next(err);
 };
   
-exports.handlesIncorrectReviewIds = (err, req, res, next) => {
+exports.handleCustomErrors = (err, req, res, next) => {
     if (err.msg === `no review found`) {
         res.status(404).send("no review found");
     } else if (err.msg === `no comments found`) {
         res.status(404).send("no comments found") 
     } else if (err.msg === `no category found`){
         res.status(404).send(`no category found`)
-    } else {
+    } else if (err.msg === `bad request`){
+        res.status(400).send(`bad request`)
+    }else {
         res.status(404)
-        }
-        next(err)
+    }
+    next(err)
 }
 
 

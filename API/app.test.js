@@ -3,6 +3,7 @@ const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
+const {toBeSortedBy} = require('jest-sorted');
 
 beforeEach(() => seed(testData));
 
@@ -106,8 +107,72 @@ describe('GET /api/reviews/:review_id', () => {
       });
 });
 
-describe.only('POST /api/reviews/:review_id/comments', () => {
-    it.skip('responds with 201: request body accepts an object with username and body property, returns posted comment', () => {
+describe('Get GET /api/reviews/:review_id/comments', () => {
+    it('responds with 200 and returns an array of comments for the given review_id', () => {
+        const review_id = 3
+        return request(app)
+            .get(`/api/reviews/${review_id}/comments`)
+            .expect(200)
+            .then(({body}) => {
+                expect(body.comments.length).toEqual(3)
+                expect(body.comments).toEqual(
+                    [{
+                        comment_id: 6,
+                        body: 'Not sure about dogs, but my cat likes to get involved with board games, the boxes are their particular favourite',
+                        review_id: 3,
+                        author: 'philippaclaire9',
+                        votes: 10,
+                        created_at: '2021-03-27T19:49:48.110Z'
+                      },
+                      {
+                        comment_id: 3,
+                        body: "I didn't know dogs could play games",
+                        review_id: 3,
+                        author: 'philippaclaire9',
+                        votes: 10,
+                        created_at: '2021-01-18T10:09:48.110Z'
+                      },
+                      {
+                        comment_id: 2,
+                        body: 'My dog loved this game too!',
+                        review_id: 3,
+                        author: 'mallionaire',
+                        votes: 13,
+                        created_at: '2021-01-18T10:09:05.410Z'
+                      }]
+                )
+                expect(body.comments).toBeSortedBy('created_at', {descending: true});
+            })
+    })
+    it("should respond with 200 empty array if review exists but no comments", () => {
+        return request(app)
+        .get(`/api/reviews/1/comments`)
+        .expect(200)
+        .then(({body}) => {
+            expect(body.comments.length).toEqual(0)
+            expect(body.comments).toEqual([])
+        })    
+    }) 
+    it("should respond with 404 and comment not found", () => {
+        return request(app)
+        .get(`/api/reviews/50/comments`)
+        .expect(404)
+        .then((body) => {
+            expect(body.text).toEqual(`no comments found`);
+            });
+    }) 
+    it("should respond with 400 and bad request", () => {
+        return request(app)
+          .get(`/api/reviews/bake/comments`)
+          .expect(400)
+          .then(( body) => {
+            expect(body.text).toEqual(`bad request`);
+          });
+      })
+})
+
+describe('POST /api/reviews/:review_id/comments', () => {
+    it('responds with 201: request body accepts an object with username and body property, returns posted comment', () => {
         const review_id = 1
         const newComment = {
             username: "dav3rid",
@@ -200,70 +265,6 @@ describe.only('POST /api/reviews/:review_id/comments', () => {
     })
 })
 
-describe('Get GET /api/reviews/:review_id/comments', () => {
-    it('responds with 200 and returns an array of comments for the given review_id', () => {
-        const review_id = 3
-        return request(app)
-            .get(`/api/reviews/${review_id}/comments`)
-            .expect(200)
-            .then(({body}) => {
-                expect(body.comments.length).toEqual(3)
-                expect(body.comments).toEqual(
-                    [{
-                        comment_id: 6,
-                        body: 'Not sure about dogs, but my cat likes to get involved with board games, the boxes are their particular favourite',
-                        review_id: 3,
-                        author: 'philippaclaire9',
-                        votes: 10,
-                        created_at: '2021-03-27T19:49:48.110Z'
-                      },
-                      {
-                        comment_id: 3,
-                        body: "I didn't know dogs could play games",
-                        review_id: 3,
-                        author: 'philippaclaire9',
-                        votes: 10,
-                        created_at: '2021-01-18T10:09:48.110Z'
-                      },
-                      {
-                        comment_id: 2,
-                        body: 'My dog loved this game too!',
-                        review_id: 3,
-                        author: 'mallionaire',
-                        votes: 13,
-                        created_at: '2021-01-18T10:09:05.410Z'
-                      }]
-                )
-                expect(body.comments).toBeSortedBy('created_at', {descending: true});
-            })
-    })
-    it("should respond with 200 empty array if review exists but no comments", () => {
-        return request(app)
-        .get(`/api/reviews/1/comments`)
-        .expect(200)
-        .then(({body}) => {
-            expect(body.comments.length).toEqual(0)
-            expect(body.comments).toEqual([])
-        })    
-    }) 
-    it("should respond with 404 and comment not found", () => {
-        return request(app)
-        .get(`/api/reviews/50/comments`)
-        .expect(404)
-        .then((body) => {
-            expect(body.text).toEqual(`no comments found`);
-            });
-    }) 
-    it("should respond with 400 and bad request", () => {
-        return request(app)
-          .get(`/api/reviews/bake/comments`)
-          .expect(400)
-          .then(( body) => {
-            expect(body.text).toEqual(`bad request`);
-          });
-      })
-})
-
 describe('PATCH /api/reviews/:review_id', () => {
     it('responds with 200: updates the votes with positive value and returns the updated review', () => {
         const review_id = 3
@@ -342,7 +343,7 @@ describe('PATCH /api/reviews/:review_id', () => {
     })
 })    
 
-describe.only('GET /api/users', () => {
+describe('GET /api/users', () => {
     it('responds with 200 and return an array of user objects', () => {
         return request(app)
         .get("/api/users")
@@ -368,7 +369,8 @@ describe.only('GET /api/users', () => {
           .then((body) => {
             expect(body.text).toEqual(`route does not exist`);
           })
-      });
+        })
+    })
       
 describe("GET /api/reviews?queries", () => {
     it("should respond with 200 and return all reviews based on category value specified in the query", () => {
@@ -427,7 +429,7 @@ describe("GET /api/reviews?queries", () => {
             expect(reviews).toBeSortedBy('created_at', {descending: true});
         })
     })
-    it.only('should respond with 404 not found if user tries to get articles by non existant categories', () => {
+    it('should respond with 404 not found if user tries to get articles by non existant categories', () => {
         const category = 'egg'
         return request(app)
             .get(`/api/reviews?category=${category}`)
