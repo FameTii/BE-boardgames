@@ -1,6 +1,7 @@
 // const categories = require("../db/data/development-data/categories");
 
 const { fetchCategories, fetchReviews, fetchReviewsWithId, updatingReviewVotes, fetchCommentsOfReviewId, fetchUsers, postingComment, deletingUsers} = require("./models");
+const endpoints = require("./endpoints.json");
 
 exports.getCategories = (req, res, next) => {
   fetchCategories()
@@ -88,5 +89,9 @@ exports.deleteComment = (req, res, next) => {
     .catch((err) => {
         next(err)
     })
+}
+
+exports.getApi = (req, res, next) => {
+    res.send(endpoints);
 }
 
