@@ -1,5 +1,3 @@
-// const categories = require("../db/data/development-data/categories");
-
 const { fetchCategories, fetchReviews, fetchReviewsWithId, updatingReviewVotes, fetchCommentsOfReviewId, fetchUsers, postingComment, deletingUsers} = require("./models");
 const endpoints = require("./endpoints.json");
 
