@@ -522,3 +522,5 @@ describe("DELETE /api/comments/:comment_id", () => {
         return request(app)
         .delete(`/api/comments/${comment_id}`)
         .expect(400)
+    })
+})

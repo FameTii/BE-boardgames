@@ -83,7 +83,7 @@ exports.deleteComment = (req, res, next) => {
     const {comment_id} = req.params
     deletingUsers(comment_id)
     .then((comment) => {
-        res.status(204).send({msg: 'comment deleted'})
+        res.status(204).send()
     })
     .catch((err) => {
         next(err)
