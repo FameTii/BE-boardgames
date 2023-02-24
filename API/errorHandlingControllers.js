@@ -35,7 +35,9 @@ exports.handleCustomErrors = (err, req, res, next) => {
         res.status(404).send(`no category found`)
     } else if (err.msg === `bad request`){
         res.status(400).send(`bad request`)
-    }else {
+    } else if (err.msg === `comment_id does not exist`){
+        res.status(404).send(`comment_id does not existt`)
+    } else {
         res.status(404)
     }
     next(err)

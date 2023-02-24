@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
 const {toBeSortedBy} = require('jest-sorted');
+// const { it } = require("node:test");
 
 beforeEach(() => seed(testData));
 
@@ -490,3 +491,34 @@ describe("GET /api/reviews/:review_id with comment count", () => {
             });
     })
 })
+
+describe("DELETE /api/comments/:comment_id", () => {
+    it("should respond with 204 and delete the given comment by comment_id", () => {
+        const comment_id = 1
+        return request(app)
+            .delete(`/api/comments/${comment_id}`)
+            .expect(204)
+    })
+    it('should return 404 and no comment_id found if comment_id is deleted more than once', () => {
+        const comment_id = 1
+        request(app)
+        .delete(`/api/comments/${comment_id}`)
+        .expect(204)
+        .end((err, res)=>{
+            if (err) throw err;
+        })
+        return request(app)
+        .delete(`/api/comments/${comment_id}`)
+        .expect(404)
+    })
+    it('should return 404 and no comment_id found if comment_id does not exist', () => {
+        const comment_id = 88
+        return request(app)
+        .delete(`/api/comments/${comment_id}`)
+        .expect(404)
+    })
+    it('should return 400 and no comment_id found if comment_id does not exist', () => {
+        const comment_id = 'egg'
+        return request(app)
+        .delete(`/api/comments/${comment_id}`)
+        .expect(400)

@@ -1,6 +1,6 @@
 // const categories = require("../db/data/development-data/categories");
 
-const { fetchCategories, fetchReviews, fetchReviewsWithId, updatingReviewVotes, fetchCommentsOfReviewId, fetchUsers, postingComment} = require("./models");
+const { fetchCategories, fetchReviews, fetchReviewsWithId, updatingReviewVotes, fetchCommentsOfReviewId, fetchUsers, postingComment, deletingUsers} = require("./models");
 
 exports.getCategories = (req, res, next) => {
   fetchCategories()
@@ -73,6 +73,17 @@ exports.getUsers = (req, res, next) => {
     fetchUsers()
     .then((users) => {
         res.status(200).send({users})
+    })
+    .catch((err) => {
+        next(err)
+    })
+}
+
+exports.deleteComment = (req, res, next) => {
+    const {comment_id} = req.params
+    deletingUsers(comment_id)
+    .then((comment) => {
+        res.status(204).send({msg: 'comment deleted'})
     })
     .catch((err) => {
         next(err)
