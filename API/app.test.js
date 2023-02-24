@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
 const {toBeSortedBy} = require('jest-sorted');
-// const { it } = require("node:test");
 
 beforeEach(() => seed(testData));
 
@@ -353,8 +352,8 @@ describe('GET /api/users', () => {
             expect(body.users).toHaveLength(4)
             const {users} = body
             expect(body.users).toBeInstanceOf(Array);
-            users.forEach((category) => {
-                expect(category).toMatchObject({
+            users.forEach((users) => {
+                expect(users).toMatchObject({
                     username: expect.any(String),
                     name: expect.any(String),
                     avatar_url: expect.any(String)
