@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const testData = require("../db/data/test-data/index");
 const app = require("./app");
 const {toBeSortedBy} = require('jest-sorted');
+const endpoints = require("./endpoints.json");
 
 beforeEach(() => seed(testData));
 
@@ -522,4 +523,15 @@ describe("DELETE /api/comments/:comment_id", () => {
         .delete(`/api/comments/${comment_id}`)
         .expect(400)
     })
+})
+
+describe("GET /api", () => {
+    it.only("should respond with 200 and all the enpoints", () => {
+        return request(app)
+            .get(`/api`)
+            .expect(200)
+            .then((response)=>{
+                expect(response.body).toEqual(endpoints)
+            })
+        })
 })
