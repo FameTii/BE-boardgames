@@ -30,7 +30,7 @@ describe('GET /api/categories', () => {
                 })
             })
     })
-    it("should respond with 404 and message if route does not exist", () => {
+    it("responds with 404 and message if route does not exist", () => {
         return request(app)
           .get("/api/cate")
           .expect(404)
