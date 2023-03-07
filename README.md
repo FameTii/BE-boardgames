@@ -4,13 +4,12 @@ The project features several endpoints, link is provided below for the hosted ve
 
 The project allows users to: 
 1. View boardgames categories and their descriptions
-2. View reviews for specified boardgames. Users can filter the reviews via category and can sort the reviews based on votes, time created, and . 
+2. View reviews for specified boardgames. Users can filter the reviews via category and can sort the reviews based on votes, time created, and review id. 
 3. View comments for boardgames reviews
 4. Post comments on boardgames reviews
 5. Upvote or downvote reviews
 6. View a list of all users currently signed up 
 7. Delete comments on reviews
-
 
 # LINK TO THE HOSTED VERSION 
 `https://fame-boardgame-review-website.onrender.com/api`
@@ -18,7 +17,7 @@ The project allows users to:
 # SETTING UP PROJECT LOCALLY
 1. Fork the repository from  `https://github.com/FameTii/BE-boardgames.git` 
 2. Clone the repository 
-2. Change to `BE-boardgames` directory
+2. cd to `BE-boardgames` directory
 3. Resolve dependencies using `npm i`
 4. Set environment variables as shown below
 Create 2 files:
