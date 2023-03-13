@@ -1,5 +1,8 @@
 const express = require("express");
+const cors = require('cors');
 const app = express();
+
+app.use(cors())
 app.use(express.json())
 
 const { getCategories, getReviews, getReviewsWithId, getCommentsOfReviewId, updateReviewVotes, getUsers, postComment, deleteComment, getApi } = require("./controller");
