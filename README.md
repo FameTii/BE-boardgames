@@ -4,7 +4,7 @@ The project features several endpoints, link is provided below for the hosted ve
 
 The project allows users to: 
 1. View boardgames categories and their descriptions
-2. View reviews for specified boardgames. Users can filter the reviews via category and can sort the reviews based on votes, time created, and review id. 
+2. View reviews for specified boardgames. Users can filter the reviews via category and can sort the reviews based on votes, time created, and comment count. 
 3. View comments for boardgames reviews
 4. Post comments on boardgames reviews
 5. Upvote or downvote reviews
