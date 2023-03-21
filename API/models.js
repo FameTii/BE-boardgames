@@ -15,7 +15,7 @@ exports.fetchCategories = () => {
 };
 
 exports.fetchReviews = (category, sortBy = "created_at", orderBy = "DESC") => {
-  const validSortByOptions = ["review_id", "created_at", "votes"];
+  const validSortByOptions = ["comment_count", "created_at", "votes"];
   const validOrderByOptions = ["ASC", "DESC"];
   const where = `WHERE category = '${category}' `;
   const order = `GROUP BY reviews.review_id ORDER BY reviews.${sortBy} ${orderBy}`;
