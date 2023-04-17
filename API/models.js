@@ -18,13 +18,17 @@ exports.fetchReviews = (category, sortBy = "created_at", orderBy = "DESC") => {
   const validSortByOptions = ["comment_count", "created_at", "votes"];
   const validOrderByOptions = ["ASC", "DESC"];
   const where = `WHERE category = '${category}' `;
-  const order = `GROUP BY reviews.review_id ORDER BY reviews.${sortBy} ${orderBy}`;
+  let order = "";
+  if (sortBy == "comment_count") {
+    order = `GROUP BY reviews.review_id ORDER BY ${sortBy} ${orderBy}`;
+  } else {
+    order = `GROUP BY reviews.review_id ORDER BY reviews.${sortBy} ${orderBy}`;
+  }
 
   let queryStr = `SELECT reviews.review_id, reviews.title, reviews.category, reviews.designer, reviews.owner, reviews.review_img_url, reviews.created_at, reviews.review_body, reviews.votes,
     COUNT (comments.review_id)::int AS comment_count
     FROM reviews
     LEFT JOIN comments ON reviews.review_id = comments.review_id `;
-
   if (category !== undefined) {
     queryStr += where;
   }
@@ -43,7 +47,6 @@ exports.fetchReviews = (category, sortBy = "created_at", orderBy = "DESC") => {
     });
   }
   queryStr += order;
-
   return db.query(queryStr).then((result) => {
     if (result.rowCount === 0) {
       return Promise.reject({
